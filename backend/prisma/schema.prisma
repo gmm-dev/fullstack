@@ -14,10 +14,10 @@ model Customer {
   id String @id @default(auto()) @map("_id") @db.ObjectId
   name String
   email String
-  cpf Int
-  phone String
-  pixKey String
-  numbers Int[] //array of numbers[1,2,3,4,5,6]
+  // cpf Int
+  // phone String
+  // pixKey String
+  // numbers Int[] //array of numbers[1,2,3,4,5,6]
   status Boolean //active or inactive
   create_at DateTime? @default(now())
   update_at DateTime? @default(now())

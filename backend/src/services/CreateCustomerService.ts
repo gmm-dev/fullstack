@@ -1,13 +1,34 @@
 //Serviço responsavel pela criação de um novo cliente
 
+import prismaClient from "../prisma";
+
+interface CreateCustomerProps {
+  name: string;
+  email: string;
+}
+
 class CreateCustomerService {
-  async execute(){
-    console.log("rota test criada")
-    return {ok: true}
+  async execute({name, email}: CreateCustomerProps){
+
+    console.log("createCustomerService activated")
+
+    // if(!name || !email){
+    //   throw new Error("Name or email incorrect");
+    // }
+
+    const customer = await prismaClient.customer.create({
+      data: {
+        name,
+        email,
+        status: true //active by default
+      },
+    })
+
+    return customer
   }
 }
 
-export { CreateCustomerService }
+export { CreateCustomerService };
 
 
 // class CreateCustomerService {
