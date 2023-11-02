@@ -1,0 +1,24 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Customer {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  name String
+  email String
+  phone String
+  numbers Int[] //array of numbers[1,2,3,4,5,6]
+  status Boolean //active or inactive
+  create_at DateTime? @default(now())
+  update_at DateTime? @default(now())
+
+  @@map("customers")
+}
