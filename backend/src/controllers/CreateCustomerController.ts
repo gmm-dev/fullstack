@@ -1,7 +1,7 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import { CreateCustomerService } from "../services/CreateCustomerService";
 
-class createCustomerController {
+class CreateCustomerController {
   async handle(request: FastifyRequest, reply: FastifyReply) {
     const {name, email} = request.body as { name: string, email: string };
     console.log(name, email);
@@ -11,4 +11,4 @@ class createCustomerController {
   }
 }
 
-export { createCustomerController };
+export { CreateCustomerController };
