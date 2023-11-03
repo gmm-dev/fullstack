@@ -10,11 +10,19 @@ interface CreateCustomerProps {
 class CreateCustomerService {
   async execute({name, email}: CreateCustomerProps){
 
-    console.log("createCustomerService activated")
+    const customerAlreadyExists = await prismaClient.customer.findFirst({
+      where: {
+        email,
+      },
+    });
 
-    // if(!name || !email){
-    //   throw new Error("Name or email incorrect");
-    // }
+    if(customerAlreadyExists){
+      throw new Error("Customer already exists!");
+    }
+
+    if(!name || !email){
+      throw new Error("Name or email incorrect");
+    }
 
     const customer = await prismaClient.customer.create({
       data: {
@@ -29,27 +37,3 @@ class CreateCustomerService {
 }
 
 export { CreateCustomerService };
-
-
-// class CreateCustomerService {
-//   async execute(name: string, email: string) {
-//     const customerAlreadyExists = await prismaClient.customer.findFirst({
-//       where: {
-//         email,
-//       },
-//     });
-
-//     if (customerAlreadyExists) {
-//       throw new Error("Customer already exists!");
-//     }
-
-//     const customer = await prismaClient.customer.create({
-//       data: {
-//         name,
-//         email,
-//       },
-//     });
-
-//     return customer;
-//   }
-// }
