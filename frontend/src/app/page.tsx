@@ -132,7 +132,7 @@ export default function Home() {
         ref={ticketRef}
         />
 
-         <input type="submit" value="Register" className="w-full p-2 font-medium bg-green-500 rounded cursor-point" />
+         <input type="submit" value="Cadastrar" className="w-full p-2 font-medium bg-green-500 rounded cursor-point" />
       </form>
 
       <section className="flex flex-col gap-4">

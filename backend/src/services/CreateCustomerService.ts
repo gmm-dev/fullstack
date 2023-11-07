@@ -6,13 +6,13 @@ interface CreateCustomerProps {
   name: string;
   email?: string;
   cpf: string;
-  phone?: number;
+  phone?: string;
   pixKey?: string;
   ticket: number[];
 }
 
 class CreateCustomerService {
-  async execute({name, cpf, ticket}: CreateCustomerProps){
+  async execute({name, cpf, ticket, email, phone, pixKey}: CreateCustomerProps){
 
     const customerAlreadyExists = await prismaClient.customer.findFirst({
       where: {
@@ -46,6 +46,9 @@ class CreateCustomerService {
         name,
         cpf,
         ticket,
+        email,
+        phone,
+        pixKey,
         status: true //active by default
       } as any,
     })
