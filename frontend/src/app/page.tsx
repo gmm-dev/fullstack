@@ -23,6 +23,8 @@ interface CustomerNumber {
 
 type Winner = {
   id: string;
+  name: string;
+  ticket: string[];
   // include other properties here if needed
 };
 
@@ -63,8 +65,8 @@ export default function Home() {
   };
 
   async function handleWinners() {
-    const numbers = chosenNumbers.map((num) => parseInt(num, 10));
-    const response = await api.post('/customers/winners', { customerNumbers: numbers });
+    const winnersNumbers = chosenNumbers.map(ticket => ticket.replace(/[^0-9]/g, ''));
+    const response = await api.post('/customers/winners', { chosenNumbers: winnersNumbers });
     setWinners(response.data);
   }
 
@@ -216,7 +218,8 @@ export default function Home() {
         <button onClick={handleWinners}>Check Winners</button>
         <ul>
           {winners.map((winner, index) => (
-            <li key={index}>{winner.id}</li>
+            <li key={index}>Name: {winner.name}, Ticket: {winner.ticket && winner.ticket.join(', ')}</li>
+
           ))}
         </ul>
         </div>
