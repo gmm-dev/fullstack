@@ -60,7 +60,7 @@ export default function Home() {
     const response = await api.post('/customer', {
       name: nameRef.current?.value,
       cpf: cpfRef.current?.value,
-      ticket: ticketRef.current?.value,
+      ticket: ticketRef.current?.value.split(",").map(ticket => ticket.trim()),
       status: true,
       email: emailRef.current?.value,
       phone: phoneRef.current?.value,

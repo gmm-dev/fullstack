@@ -1,14 +1,15 @@
 //Serviço responsável pela criação de um novo cliente
-
 import prismaClient from "../prisma";
 
-interface CreateCustomerProps {
+export type ticketNumbers = string[];
+
+export interface CreateCustomerProps {
   name: string;
   email?: string;
   cpf: string;
   phone?: string;
   pixKey?: string;
-  ticket: string[];
+  ticket: ticketNumbers;
 }
 
 class CreateCustomerService {
@@ -34,7 +35,11 @@ class CreateCustomerService {
     }
 
     //check if ticket is a number between 1 and 60 and if it has 6 numbers
+
+
     if(ticket.length != 6){
+    console.log("🚀 ~ file: CreateCustomerService.ts:38 ~ CreateCustomerService ~ execute ~ ticket:", ticket)
+
       throw new Error("Ticket must have 6 numbers");
     }
     for(let i = 0; i < ticket.length; i++){
@@ -44,20 +49,7 @@ class CreateCustomerService {
       }
     }
       throw new Error("Ticket must be a number between 1 and 60");
-      
-    const customer = await prismaClient.customer.create({
-      data: {
-        name,
-        cpf,
-        ticket,
-        email,
-        phone,
-        pixKey,
-        status: true //active by default
-      }
-    })
 
-    return customer
 
       }
     }
