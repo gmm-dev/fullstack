@@ -10,10 +10,13 @@ export interface CreateCustomerProps {
   phone?: string;
   pixKey?: string;
   ticket: ticketNumbers;
+  status: true;
 }
 
 class CreateCustomerService {
-  async execute({name, cpf, ticket, email, phone, pixKey}: CreateCustomerProps){
+  async execute({name, cpf, ticket, email, phone, pixKey, status}: CreateCustomerProps){
+    console.log("🚀 ~ file: CreateCustomerService.ts:17 ~ CreateCustomerService ~ execute ~ name, cpf, ticket, email, phone, pixKey:", name, cpf, ticket, email, phone, pixKey)
+
 
     const customerAlreadyExists = await prismaClient.customer.findFirst({
       where: {
@@ -36,29 +39,32 @@ class CreateCustomerService {
 
     //check if ticket is a number between 1 and 60 and if it has 6 numbers
 
+    // if (!Array.isArray(ticket) || ticket.length !== 6) {
+    //   throw new Error("Ticket must be an array of 6 numbers");
+    // }
 
-    if(ticket.length != 6){
-    console.log("🚀 ~ file: CreateCustomerService.ts:38 ~ CreateCustomerService ~ execute ~ ticket:", ticket)
+    // for(let i = 0; i < ticket.length; i++){
+    //   const ticketNumber = parseInt(ticket[i]);
+    //   if(isNaN(ticketNumber) || ticketNumber < 1 || ticketNumber > 60){
+    //     throw new Error("Ticket must be a number between 1 and 60");
+    //   }
+    //   ticket[i] = ticketNumber;
+    // }
 
-      throw new Error("Ticket must have 6 numbers");
+
+    const customer = await prismaClient.customer.create({
+      data: {
+        name,
+        cpf,
+        ticket,
+        email,
+        phone,
+        pixKey,
+        status
+      },
+    });
+    return customer;
     }
-    for(let i = 0; i < ticket.length; i++){
-      const ticketNumber = parseInt(ticket[i]);
-      if(isNaN(ticketNumber) || ticketNumber < 1 || ticketNumber > 60){
-        throw new Error("Ticket must be a number between 1 and 60");
-      }
-    }
-      throw new Error("Ticket must be a number between 1 and 60");
+  }
 
-
-      }
-    }
-
-
-
-
-
-
-
-
-export { CreateCustomerService };
+  export { CreateCustomerService };

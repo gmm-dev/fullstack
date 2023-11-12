@@ -16,3 +16,13 @@ xl	1280px	@media (min-width: 1280px) { ... }
   padding: 0;
   box-sizing: border-box;
 }
+
+img {
+  font-style:italic;
+  background-repeat: no-repeat;
+  background-size: cover;
+  shape-margin: 1rem;
+  max-width: 100%;
+  height: auto;
+  vertical-align: middle;
+}

@@ -1,8 +1,9 @@
 
 'use client'
 
-import { FormEvent, useEffect, useRef, useState } from 'react';
+import { ChangeEvent, FormEvent, useEffect, useRef, useState } from 'react';
 import { FiTrash } from 'react-icons/fi';
+import InputMask from 'react-input-mask';
 import { api } from '../services/api';
 
 interface CustomerProps {
@@ -16,13 +17,25 @@ interface CustomerProps {
   status: boolean;
 }
 
+interface CustomerNumber {
+  [index: number]: string;
+}
+
+type Winner = {
+  id: string;
+  // include other properties here if needed
+};
+
 
 export default function Home() {
 
   const [customers, setCustomers] = useState<CustomerProps[]>([])
+  const [customerNumbers, setCustomerNumbers] = useState(Array(6).fill(''));
+  const [chosenNumbers, setChosenNumbers] = useState(Array(6).fill(''));
+  const [winners, setWinners] = useState<Winner[]>([]);
   const nameRef = useRef<HTMLInputElement | null>(null)
   const cpfRef = useRef<HTMLInputElement | null>(null)
-  const ticketRef = useRef<HTMLInputElement | null>(null)
+  // const ticketRef = useRef<HTMLInputElement | null>(null)
   const emailRef = useRef<HTMLInputElement | null>(null)
   const phoneRef = useRef<HTMLInputElement | null>(null)
   const pixKeyRef = useRef<HTMLInputElement | null>(null)
@@ -37,12 +50,31 @@ export default function Home() {
    setCustomers(response.data)
   }
 
+  const handleChange = (index: number, event: ChangeEvent<HTMLInputElement>) => {
+    const newCustomerNumbers = [...customerNumbers];
+    newCustomerNumbers[index] = event.target.value;
+    setCustomerNumbers(newCustomerNumbers);
+  };
+
+  const handleInputChange = (index: number, event: React.ChangeEvent<HTMLInputElement>) => {
+    const newChosenNumbers = [...chosenNumbers];
+    newChosenNumbers[index] = event.target.value;
+    setChosenNumbers(newChosenNumbers);
+  };
+
+  async function handleWinners() {
+    const numbers = chosenNumbers.map((num) => parseInt(num, 10));
+    const response = await api.post('/customers/winners', { customerNumbers: numbers });
+    setWinners(response.data);
+  }
+
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
 
+    console.log("🚀 ~ file: page.tsx:53 ~ handleSubmit ~ e:", e)
     const name = nameRef.current?.value
     const cpf = cpfRef.current?.value
-    const ticket = ticketRef.current?.value
+    const ticket = customerNumbers;
     // const email = emailRef.current?.value
     // const phone = phoneRef.current?.value
     // const pixKey = pixKeyRef.current?.value
@@ -57,28 +89,27 @@ export default function Home() {
 
     console.log(e)
 
-    const response = await api.post('/customer', {
+    const apiResponse = await api.post('/customer', {
       name: nameRef.current?.value,
       cpf: cpfRef.current?.value,
-      ticket: ticketRef.current?.value.split(",").map(ticket => ticket.trim()),
+      ticket: customerNumbers,
       status: true,
       email: emailRef.current?.value,
       phone: phoneRef.current?.value,
       pixKey: pixKeyRef.current?.value
     })
-
-    setCustomers(allCustomers => [...allCustomers, response.data])
+    setCustomers(allCustomers => [...allCustomers, apiResponse.data])
 
 
     // clear input
     if (nameRef.current) nameRef.current.value = "";
     if (cpfRef.current) cpfRef.current.value = "";
-    if (ticketRef.current) ticketRef.current.value = "";
     if (emailRef.current) emailRef.current.value = "";
     if (phoneRef.current) phoneRef.current.value = "";
     if (pixKeyRef.current) pixKeyRef.current.value = "";
-
+    if(setCustomerNumbers) setCustomerNumbers(Array(6).fill(''));
   }
+
 
   async function handleDelete(id: string) {
     try {
@@ -127,10 +158,20 @@ export default function Home() {
         ref={pixKeyRef}
         />
         <label className="font-medium text-white">Cartela:</label>
-        <input type="text"
+        {customerNumbers.map((number, index) => (
+        <InputMask
+          key={index}
+          mask="99"
+          value={number}
+          onChange={event => handleChange(index, event)}
+        />
+      ))}
+
+
+        {/* <input type="text"
         placeholder="Digite os 6 números escolhidos separados por virgula." className="w-full p-2 mb-5 rounded"
         ref={ticketRef}
-        />
+        /> */}
 
          <input type="submit" value="Cadastrar" className="w-full p-2 font-medium bg-green-500 rounded cursor-point" />
       </form>
@@ -144,7 +185,7 @@ export default function Home() {
           <p><span className="font-medium">Email: </span> {customer?.email}</p>
           <p><span className="font-medium">Telefone: </span> {customer?.phone}</p>
           <p><span className="font-medium">Chave PIX: </span> {customer?.pixKey}</p>
-          <p><span className="font-medium">Ticket: </span> {customer.ticket}</p>
+          <p><span className="font-medium">Ticket: </span> {customer.ticket.join(', ')}</p>
           <p><span className="font-medium">Status: </span> {customer.status ? "ATIVO" : "INATIVO"}</p>
 
           <button
@@ -155,7 +196,30 @@ export default function Home() {
           </button>
         </article>
         ))}
+        <div>
+        {chosenNumbers.map((number, index) => (
+        //   <InputMask
+        //   key={index}
+        //   mask="99"
+        //   value={number}
+        //   onChange={(event) => handleInputChange(index, event)}
+        //   render={(inputProps: any) => <input {...inputProps} type="text" />}
+        // />
+        <InputMask
+        key={index}
+        mask="99"
+        value={number}
+        onChange={event => handleInputChange(index, event)}
+       />
+        ))}
 
+        <button onClick={handleWinners}>Check Winners</button>
+        <ul>
+          {winners.map((winner, index) => (
+            <li key={index}>{winner.id}</li>
+          ))}
+        </ul>
+        </div>
       </section>
       </main>
     </div>

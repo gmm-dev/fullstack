@@ -1,8 +1,8 @@
 import prismaClient from "../prisma";
 import { ticketNumbers } from './CreateCustomerService';
 
-class FilterCustomersService {
-  async filterByTickets(tickets: ticketNumbers[]) {
+class GetWinnersService {
+  async filterByTickets(tickets: ticketNumbers) {
     return await prismaClient.customer.findMany({
       where: {
         ticket: {
@@ -13,4 +13,4 @@ class FilterCustomersService {
   }
 }
 
-export { FilterCustomersService };
+export { GetWinnersService };

@@ -1,12 +1,17 @@
 import { FastifyReply, FastifyRequest } from "fastify";
-import { CreateCustomerService } from "../services/CreateCustomerService";
+import { CreateCustomerProps, CreateCustomerService } from "../services/CreateCustomerService";
 
 class CreateCustomerController {
   async handle(request: FastifyRequest, reply: FastifyReply) {
-    const {name, cpf, ticket, email, phone, pixKey} = request.body as { name: string, cpf: string, ticket: string[], email?: string, phone?: string, pixKey?:string};
-    const customerService = new CreateCustomerService();
-    const customer = await customerService.execute({name, cpf, ticket, email, phone, pixKey});
-    return reply.send(customer);
+    const data = request.body as CreateCustomerProps;
+    data.ticket = data.ticket.map(ticket => String(Number(ticket.replace(/[^0-9]/g, ''))));
+    const createCustomerService = new CreateCustomerService();
+    try {
+      const customer = await createCustomerService.execute(data);
+      return reply.send(customer);
+    } catch (error) {
+      return reply.send(error);
+    }
   }
 }
 
