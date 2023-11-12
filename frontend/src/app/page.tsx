@@ -12,7 +12,7 @@ interface CustomerProps {
   cpf: string;
   phone?: number;
   pixKey?: string;
-  ticket: number[];
+  ticket: string[];
   status: boolean;
 }
 
@@ -60,7 +60,7 @@ export default function Home() {
     const response = await api.post('/customer', {
       name: nameRef.current?.value,
       cpf: cpfRef.current?.value,
-      ticket: ticketRef.current?.value.split(",").map(Number),
+      ticket: ticketRef.current?.value,
       status: true,
       email: emailRef.current?.value,
       phone: phoneRef.current?.value,

@@ -8,7 +8,7 @@ interface CreateCustomerProps {
   cpf: string;
   phone?: string;
   pixKey?: string;
-  ticket: number[];
+  ticket: string[];
 }
 
 class CreateCustomerService {
@@ -34,13 +34,17 @@ class CreateCustomerService {
     }
 
     //check if ticket is a number between 1 and 60 and if it has 6 numbers
-    if(ticket.length !== 6 || ticket.some((number) => number < 1 || number > 60)){
-      throw new Error("Ticket must have 6 numbers between 1 and 60");
+    if(ticket.length != 6){
+      throw new Error("Ticket must have 6 numbers");
     }
-
-
-
-
+    for(let i = 0; i < ticket.length; i++){
+      const ticketNumber = parseInt(ticket[i]);
+      if(isNaN(ticketNumber) || ticketNumber < 1 || ticketNumber > 60){
+        throw new Error("Ticket must be a number between 1 and 60");
+      }
+    }
+      throw new Error("Ticket must be a number between 1 and 60");
+      
     const customer = await prismaClient.customer.create({
       data: {
         name,
@@ -50,11 +54,19 @@ class CreateCustomerService {
         phone,
         pixKey,
         status: true //active by default
-      } as any,
+      }
     })
 
     return customer
-  }
-}
+
+      }
+    }
+
+
+
+
+
+
+
 
 export { CreateCustomerService };
