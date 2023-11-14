@@ -6,7 +6,7 @@ class GetWinnersService {
     return await prismaClient.customer.findMany({
       where: {
         ticket: {
-          hasSome: tickets,
+          hasEvery: tickets,
         },
       },
     });

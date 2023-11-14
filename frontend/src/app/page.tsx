@@ -210,6 +210,7 @@ export default function Home() {
           alwaysShowMask={false}
           value={number}
           onChange={(event) => handleCustomerNumbersInput(index, event)}
+          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline my-2"
         />
       ))}
 
@@ -245,11 +246,15 @@ export default function Home() {
         alwaysShowMask={false}
         value={number}
         onChange={event => handleChosenNumbersInput(index, event)}
+        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline my-2"
        />
         ))}
 
-        <button onClick={handleWinners}>Check Winners</button>
-        <ul>
+        <button
+        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 my-2 rounded"
+        onClick={handleWinners}
+        >Check Winners</button>
+        <ul className='list-disc list-inside space-y-2 w-full p-2 duration-200 bg-white rounded hover:scale-105'>
           {winners.map((winner, index) => (
             <li key={index}>Name: {winner.name}, Ticket: {winner.ticket && winner.ticket.join(', ')}</li>
 
