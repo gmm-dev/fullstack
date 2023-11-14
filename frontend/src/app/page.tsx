@@ -1,7 +1,7 @@
 
 'use client'
 
-import { ChangeEvent, FormEvent, useEffect, useRef, useState } from 'react';
+import { FormEvent, useEffect, useRef, useState } from 'react';
 import { FiTrash } from 'react-icons/fi';
 import InputMask from 'react-input-mask';
 import { api } from '../services/api';
@@ -13,7 +13,7 @@ interface CustomerProps {
   cpf: string;
   phone?: number;
   pixKey?: string;
-  ticket: string[];
+  ticket: number[];
   status: boolean;
 }
 
@@ -24,7 +24,7 @@ interface CustomerNumber {
 type Winner = {
   id: string;
   name: string;
-  ticket: string[];
+  ticket: number[];
   // include other properties here if needed
 };
 
@@ -32,8 +32,8 @@ type Winner = {
 export default function Home() {
 
   const [customers, setCustomers] = useState<CustomerProps[]>([])
-  const [customerNumbers, setCustomerNumbers] = useState(Array(6).fill(''));
-  const [chosenNumbers, setChosenNumbers] = useState(Array(6).fill(''));
+  const [customerNumbers, setCustomerNumbers] = useState(Array(6).fill(""));
+  const [chosenNumbers, setChosenNumbers] = useState(Array(6).fill(""));
   const [winners, setWinners] = useState<Winner[]>([]);
   const nameRef = useRef<HTMLInputElement | null>(null)
   const cpfRef = useRef<HTMLInputElement | null>(null)
@@ -52,34 +52,59 @@ export default function Home() {
    setCustomers(response.data)
   }
 
-  const handleChange = (index: number, event: ChangeEvent<HTMLInputElement>) => {
-    const newCustomerNumbers = [...customerNumbers];
-    newCustomerNumbers[index] = event.target.value;
-    setCustomerNumbers(newCustomerNumbers);
-  };
+  function handleCustomerNumbersInput(index: number, event: React.ChangeEvent<HTMLInputElement>) {
+    const newNumber = Number(event.target.value);
 
-  const handleInputChange = (index: number, event: React.ChangeEvent<HTMLInputElement>) => {
+    // Validate that the number is between 1 and 60
+    if (newNumber < 1 || newNumber > 60) {
+      alert('Number must be between 1 and 60');
+      return;
+    }
+
+    const newCustomerNumbers = [...customerNumbers];
+    newCustomerNumbers[index] = newNumber;
+    setCustomerNumbers(newCustomerNumbers);
+  }
+
+
+  function handleChosenNumbersInput(index: number, event: React.ChangeEvent<HTMLInputElement>) {
+    const newNumber = Number(event.target.value);
+
+    // Validate that the number is between 1 and 60
+    // if (newNumber < 1 || newNumber > 60) {
+    //   alert('Number must be between 1 and 60');
+    //   return;
+    // }
+
     const newChosenNumbers = [...chosenNumbers];
-    newChosenNumbers[index] = event.target.value;
+    newChosenNumbers[index] = newNumber; // store as a number, not a string
     setChosenNumbers(newChosenNumbers);
-  };
+  }
 
   async function handleWinners() {
-    const winnersNumbers = chosenNumbers.map(ticket => ticket.replace(/[^0-9]/g, ''));
-    const response = await api.post('/customers/winners', { chosenNumbers: winnersNumbers });
-    setWinners(response.data);
+    console.log("handleeeeewinnersss")
+    if (!chosenNumbers.every(num => num >= 1 && num <= 60)) {
+      alert('All numbers must be between 1 and 60');
+      return;
+    }
+    const response = await api.post('customers/winners', { chosenNumbers: chosenNumbers });
+    setWinners(response.data as Winner[]);
+    console.log("🚀 ~ file: page.tsx:82 ~ handleWinners ~ response.data:", response.data)
   }
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
 
+    // Convert customerNumbers to integers
+    const customerTicketNumbers = customerNumbers.map(Number);
+
     console.log("🚀 ~ file: page.tsx:53 ~ handleSubmit ~ e:", e)
     const name = nameRef.current?.value
     const cpf = cpfRef.current?.value
-    const ticket = customerNumbers;
-    // const email = emailRef.current?.value
-    // const phone = phoneRef.current?.value
-    // const pixKey = pixKeyRef.current?.value
+    const ticket = customerTicketNumbers;
+    const email = emailRef.current?.value
+    const phone = phoneRef.current?.value
+    const pixKey = pixKeyRef.current?.value
 
     if(!name || !cpf || !ticket) return alert("Preencha todos os campos obrigatórios: Nome, CPF e Cartela!")
 
@@ -89,17 +114,34 @@ export default function Home() {
     // if(!ticket.match(/^[0-9]+$/)) return alert("O campo Cartela só aceita números!")
     if(ticket.length < 6) return alert("O campo Cartela deve ter 6 números separados por virgulas!")
 
-    console.log(e)
-
-    const apiResponse = await api.post('/customer', {
-      name: nameRef.current?.value,
-      cpf: cpfRef.current?.value,
-      ticket: customerNumbers,
+    const data = {
+      name: name,
+      cpf: cpf,
+      ticket: ticket,
+      email: email,
+      phone: phone,
+      pixKey: pixKey,
       status: true,
-      email: emailRef.current?.value,
-      phone: phoneRef.current?.value,
-      pixKey: pixKeyRef.current?.value
-    })
+    };
+
+    const apiResponse = await api.post('/customer', data);
+
+    if (apiResponse.status === 200) {
+      alert('Customer created successfully');
+    } else {
+      alert('Error creating customer');
+    }
+
+
+    // const apiResponse = await api.post('/customer', {
+    //   name: nameRef.current?.value,
+    //   cpf: cpfRef.current?.value,
+    //   ticket: customerNumbers,
+    //   status: true,
+    //   email: emailRef.current?.value,
+    //   phone: phoneRef.current?.value,
+    //   pixKey: pixKeyRef.current?.value
+    // })
     setCustomers(allCustomers => [...allCustomers, apiResponse.data])
 
 
@@ -164,16 +206,12 @@ export default function Home() {
         <InputMask
           key={index}
           mask="99"
+          maskChar=""
+          alwaysShowMask={false}
           value={number}
-          onChange={event => handleChange(index, event)}
+          onChange={(event) => handleCustomerNumbersInput(index, event)}
         />
       ))}
-
-
-        {/* <input type="text"
-        placeholder="Digite os 6 números escolhidos separados por virgula." className="w-full p-2 mb-5 rounded"
-        ref={ticketRef}
-        /> */}
 
          <input type="submit" value="Cadastrar" className="w-full p-2 font-medium bg-green-500 rounded cursor-point" />
       </form>
@@ -200,18 +238,13 @@ export default function Home() {
         ))}
         <div>
         {chosenNumbers.map((number, index) => (
-        //   <InputMask
-        //   key={index}
-        //   mask="99"
-        //   value={number}
-        //   onChange={(event) => handleInputChange(index, event)}
-        //   render={(inputProps: any) => <input {...inputProps} type="text" />}
-        // />
         <InputMask
         key={index}
         mask="99"
+        maskChar=""
+        alwaysShowMask={false}
         value={number}
-        onChange={event => handleInputChange(index, event)}
+        onChange={event => handleChosenNumbersInput(index, event)}
        />
         ))}
 
